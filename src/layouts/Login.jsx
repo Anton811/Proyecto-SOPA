@@ -27,33 +27,43 @@ export default function Login() {
 
   return (
     <main className="login-main">
-      <div className="container">
-        <h1>Inicio de Sesion</h1>
-        <form onSubmit={handleSubmit}>
+      <div className="login-card container">
+        <header className="login-header">
+          <h1>Inicio de Sesión</h1>
+          <p className="login-sub">Accede a tu panel para gestionar la aplicación</p>
+        </header>
+
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="input-form">
-            <label htmlFor="">Usuario</label>
+            <label htmlFor="email">Usuario</label>
             <input
               type="email"
               name="email"
               id="email"
-              value={input.email}
+              value={input.email || ""}
               onChange={handleChange}
               required
+              aria-label="email"
+              placeholder="tu@correo.com"
             />
           </div>
+
           <div className="input-form">
-            <label htmlFor="">Contraseña</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               name="password"
               id="password"
-              value={input.password}
+              value={input.password || ""}
               onChange={handleChange}
               required
+              aria-label="password"
+              placeholder="********"
             />
           </div>
-          <div>
-            <input type="submit" value="Iniciar Sesion" className="btn" />
+
+          <div className="form-actions">
+            <input type="submit" value="Iniciar Sesión" className="btn primary" />
           </div>
         </form>
       </div>
