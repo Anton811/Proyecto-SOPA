@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Box from "../components/box";
+import Box from "../components/Box";
 import Nav from "../components/Nav";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
