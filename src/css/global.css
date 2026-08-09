@@ -1,0 +1,100 @@
+body {
+  background-color: #bbbfbf;
+  margin: 0;
+}
+
+.svg {
+  margin: 5px;
+  width: 5%;
+  height: max-content;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  box-shadow: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.btn:hover {
+  background-color: #ffffff;
+  color: #05ad98;
+  border-color: #ffffff;
+}
+
+.btn-principal {
+  background-color: #05ad98;
+  color: #ffffff;
+  border-color: #05ad98;
+}
+
+.btn-cancelar {
+  background-color: red;
+  color: #ffffff;
+  border-color: red;
+}
+
+.product-box {
+  max-width: 750px;
+  margin: 2rem auto;
+}
+
+.product-form {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 760px;
+}
+
+.product-form label {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.product-form input,
+.product-form textarea,
+.product-form select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.95rem 1rem;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.product-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.product-form p {
+  margin: 0;
+  color: #064f4a;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+}

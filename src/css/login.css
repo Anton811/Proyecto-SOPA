@@ -1,0 +1,21 @@
+.login-main {
+  display: flex;
+  width: 100dvw;
+  height: 100dvh;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background-color: white;
+  border-radius: 20px;
+  padding: 2%;
+}
+
+input {
+  width: 100%;
+}
+
+.input-form {
+  margin: 10px;
+}
