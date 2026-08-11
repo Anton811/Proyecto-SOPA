@@ -1,99 +1,40 @@
 .app-nav {
-  background: linear-gradient(90deg, #04917f 0%, #05ad98 100%);
   display: flex;
-  align-items: center;
+  position: static;
+  max-width: 100dvw;
+  background-color: #069b83;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem 2rem;
-  border-radius: 0 0 24px 24px;
-  color: #ffffff;
-  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px;
+  border-radius: 0 0 20px 20px;
 }
 
 .nav-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.nav-brand h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.nav-brand p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.95rem;
+  color: white;
 }
 
 .nav-actions {
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
-  font-weight: 700;
-  padding: 0.7rem 1rem;
-  border-radius: 12px;
-  transition: background-color 0.2s ease;
+  font-weight: bold;
+  color: white;
 }
 
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+.nav-buttons {
+  display: flex;
+  gap: 5px;
 }
 
-.btn {
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 15px;
-  box-shadow: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.btn:hover {
-  background-color: #ffffff;
-  color: #05ad98;
-  border-color: #ffffff;
-}
-
-.btn-principal {
-  background-color: #ffffff;
-  color: #05ad98;
-  border-color: #ffffff;
-}
-
-.btn-cancelar {
-  background-color: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.38);
-}
-
-.btn-cancelar:hover {
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #d31f1f;
-  border-color: rgba(255, 255, 255, 0.95);
-}
-
-@media (max-width: 760px) {
+@media (max-width: 500px) {
   .app-nav {
-    padding: 1rem;
+    flex-direction: column;
   }
-
   .nav-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .btn,
-  .nav-link {
-    width: 100%;
-    text-align: center;
+    flex-direction: column;
   }
 }

@@ -40,7 +40,7 @@ const products = [
 ];
 
 export default function Dashboard() {
-  const status = ["Disponible", "agotado", "No disponible"];
+  const status = ["Disponible", "No disponible", "Agotado"];
   const category = ["Electronica", "Ropa", "Hogar", "Salud"];
   const priority = ["Normal", "Urgente", "Baja"];
   const navigate = useNavigate();
@@ -49,14 +49,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     insertProducts();
-    console.log(product);
   }, []);
 
   const insertProducts = async () => {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("id_user", await getUser());
+      .eq("id_user", await getUser())
+      .order("time_created", { ascending: true });
 
     if (error) return console.error("error en solicitud de productos", error);
 
@@ -74,6 +74,15 @@ export default function Dashboard() {
     if (user) return user.id;
   };
 
+  const handleDelete = async (id, name) => {
+    if (confirm(`Desea eliminar de manea permanete el ${name}?`)) {
+      const { data, error } = await supabase.from("products").delete().eq("id", id);
+      if (error) return console.error("Error al borrar producto:", error);
+
+      return alert(`${name} eliminado correctamente`);
+    }
+  };
+
   return (
     <>
       <Nav />
@@ -86,36 +95,42 @@ export default function Dashboard() {
         <div className="box-list">
           {product.map((product) => (
             <Box key={product.id}>
-              <div className="card-header">
-                <h1>{product.name}</h1>
-                <span
-                  className={`badge badge-${status[product.status].toLowerCase().replace(/\s+/g, "-")}`}
-                >
+              <h1>{product.name}</h1>
+              <div className="box-row">
+                <span className={`status status-${product.status}`}>
                   {status[product.status]}
                 </span>
               </div>
 
-              <div className="flex-container card-row">
-                <h5>Precio:</h5>
+              <div className="box-row">
+                <span>Precio:</span>
                 <strong>${product.price}</strong>
               </div>
 
-              <div className="flex-container card-row">
+              <div className="box-row">
                 <span>Categoria:</span>
                 <span>{category[product.category]}</span>
               </div>
 
-              <div className="flex-container card-row">
+              <div className="box-row">
                 <span>Prioridad:</span>
                 <span>{priority[product.priority]}</span>
               </div>
 
-              <button
-                className="btn btn-principal btn-block"
-                onClick={() => navigate(`/product/${product.id}`)}
-              >
-                Ver más
-              </button>
+              <div className="box-actions">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  Ver más
+                </button>
+                <button
+                  className="btn btn-cancel"
+                  onClick={() => handleDelete(product.id, product.name)}
+                >
+                  Eliminar
+                </button>
+              </div>
             </Box>
           ))}
         </div>

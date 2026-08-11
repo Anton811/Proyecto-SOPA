@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../css/login.css";
+import "../css/global.css";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 
@@ -29,7 +30,7 @@ export default function Login() {
     <main className="login-main">
       <div className="login-card container">
         <header className="login-header">
-          <h1>Inicio de Sesión</h1>
+          <h1 className="login-title">Inicio de Sesión</h1>
           <p className="login-sub">Accede a tu panel para gestionar la aplicación</p>
         </header>
 
@@ -37,6 +38,7 @@ export default function Login() {
           <div className="input-form">
             <label htmlFor="email">Usuario</label>
             <input
+              className="input"
               type="email"
               name="email"
               id="email"
@@ -51,6 +53,7 @@ export default function Login() {
           <div className="input-form">
             <label htmlFor="password">Contraseña</label>
             <input
+              className="input"
               type="password"
               name="password"
               id="password"
@@ -63,7 +66,7 @@ export default function Login() {
           </div>
 
           <div className="form-actions">
-            <input type="submit" value="Iniciar Sesión" className="btn primary" />
+            <input type="submit" value="Iniciar Sesión" className="btn btn-primary" />
           </div>
         </form>
       </div>

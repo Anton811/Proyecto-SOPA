@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Nav from "../components/Nav";
 import { supabase } from "../utils/supabase";
+import "../css/product.css";
 
 export default function Product() {
   const { id } = useParams();
@@ -71,8 +72,8 @@ export default function Product() {
   return (
     <>
       <Nav />
-      <main>
-        <div className="box product-box">
+      <main className="product-main">
+        <div className="form-box">
           {isLoading === false ? (
             <>
               <h1>Crear nuevo producto</h1>
@@ -86,11 +87,12 @@ export default function Product() {
                     onChange={handleChange}
                     placeholder="Ej. IPhone 17 Pro Max"
                     autoComplete="off"
+                    className="input"
                     required
                   />
                 </label>
 
-                <div className="input-row">
+                <div className="row">
                   <label>
                     Precio
                     <input
@@ -99,11 +101,17 @@ export default function Product() {
                       value={product.price}
                       onChange={handleChange}
                       placeholder="15000"
+                      className="input"
                     />
                   </label>
                   <label>
                     Estatus
-                    <select name="status" value={product.status} onChange={handleChange}>
+                    <select
+                      name="status"
+                      value={product.status}
+                      onChange={handleChange}
+                      className="input"
+                    >
                       <option value={0}>Disponible</option>
                       <option value={1}>No disponible</option>
                       <option value={2}>Agotado</option>
@@ -111,10 +119,15 @@ export default function Product() {
                   </label>
                 </div>
 
-                <div className="input-row">
+                <div className="row">
                   <label>
                     Categoría
-                    <select name="category" value={product.category} onChange={handleChange}>
+                    <select
+                      name="category"
+                      value={product.category}
+                      onChange={handleChange}
+                      className="input"
+                    >
                       <option value={0}>Electrónica</option>
                       <option value={1}>Ropa</option>
                       <option value={2}>Hogar</option>
@@ -123,7 +136,12 @@ export default function Product() {
                   </label>
                   <label>
                     Prioridad
-                    <select name="priority" value={product.priority} onChange={handleChange}>
+                    <select
+                      name="priority"
+                      value={product.priority}
+                      onChange={handleChange}
+                      className="input"
+                    >
                       <option value={0}>Normal</option>
                       <option value={1}>Urgente</option>
                       <option value={2}>Baja</option>
@@ -138,16 +156,17 @@ export default function Product() {
                     value={product.description}
                     onChange={handleChange}
                     placeholder="Describe las características del producto"
+                    className="textarea input"
                   />
                 </label>
 
-                <div className="btn-group">
-                  <button type="submit" className="btn btn-principal">
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-primary">
                     Guardar producto
                   </button>
                   <button
                     type="button"
-                    className="btn btn-cancelar"
+                    className="btn btn-cancel"
                     onClick={() => navigate("/dashboard")}
                   >
                     Cancelar

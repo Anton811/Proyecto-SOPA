@@ -22,12 +22,14 @@ export default function Nav() {
         <Link to="/dashboard" className="nav-link">
           Dashboard
         </Link>
-        <button onClick={() => navigate("/product/add")} className="btn btn-principal">
-          Añadir Producto
-        </button>
-        <button onClick={handleSignOut} className="btn btn-cancelar">
-          Cerrar Sesión
-        </button>
+        <div className="nav-buttons">
+          <button onClick={() => navigate("/product/add")} className="btn btn-primary">
+            Añadir Producto
+          </button>
+          <button onClick={handleSignOut} className="btn btn-secondary">
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     </nav>
   );

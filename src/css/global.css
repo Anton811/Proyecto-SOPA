@@ -1,100 +1,72 @@
+* {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+p {
+  font-family: sans-serif;
+}
+
 body {
-  background-color: #bbbfbf;
+  background-color: #effef9;
   margin: 0;
 }
 
-.svg {
-  margin: 5px;
-  width: 5%;
-  height: max-content;
+.input {
+  width: 100%;
+  height: 25px;
+  border: 0;
+  border: 1px solid grey;
+  border-radius: 5px;
+}
+
+.input:focus {
+  outline: none;
+  border: 0;
+  border-bottom: 2px solid #069b83;
 }
 
 .btn {
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 15px;
-  box-shadow: none;
+  border-radius: 20px;
+  padding: 10px;
+  font-weight: bold;
+  border: 2px solid white;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
 }
 
-.btn:hover {
-  background-color: #ffffff;
-  color: #05ad98;
-  border-color: #ffffff;
+.btn-primary {
+  background-color: #069b83;
+  color: white;
 }
 
-.btn-principal {
-  background-color: #05ad98;
-  color: #ffffff;
-  border-color: #05ad98;
+.btn-primary:hover {
+  background-color: white;
+  color: #069b83;
+  border: 2px solid #069b83;
 }
 
-.btn-cancelar {
+.btn-secondary {
+  background-color: white;
+  color: #069b83;
+}
+
+.btn-secondary:hover {
+  background-color: #069b83;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-cancel {
   background-color: red;
-  color: #ffffff;
-  border-color: red;
+  color: white;
 }
 
-.product-box {
-  max-width: 750px;
-  margin: 2rem auto;
+.btn-cancel:hover {
+  background-color: white;
+  color: red;
+  border: 2px solid red;
 }
 
-.product-form {
-  display: grid;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 760px;
-}
-
-.product-form label {
-  display: grid;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  width: 100%;
-}
-
-.product-form input,
-.product-form textarea,
-.product-form select {
-  width: 100%;
-  min-width: 0;
-  padding: 0.95rem 1rem;
-  border: 1px solid #d4d4d4;
-  border-radius: 12px;
-  font-size: 1rem;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.product-form textarea {
-  min-height: 140px;
-  resize: vertical;
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.btn-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.product-form p {
-  margin: 0;
-  color: #064f4a;
-  font-weight: 600;
-}
-
-@media (max-width: 760px) {
-  .input-row {
-    grid-template-columns: 1fr;
-  }
+.textarea {
+  min-width: 100%;
+  height: 20dvh;
 }

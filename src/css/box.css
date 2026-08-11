@@ -1,82 +1,56 @@
 .box-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  margin: 2rem;
-  gap: 1.25rem;
+  grid-template-columns: 1fr 1fr;
+  padding: 20px;
+  gap: 20px;
 }
 
 .box {
-  background: linear-gradient(180deg, #f8fffb 0%, #ffffff 100%);
-  padding: 1.75rem;
-  border-radius: 24px;
-  border: 1px solid rgba(5, 173, 152, 0.14);
-  box-shadow: 0px 18px 40px -18px rgba(0, 0, 0, 0.2);
-  min-height: 240px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 2px 2px 7px gray;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.card-header h1 {
-  font-size: 1.2rem;
-  margin: 0;
-  color: #052f30;
-}
-
-.badge {
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.badge-disponible {
-  color: #0a6b5a;
-  background-color: #e6fff6;
-}
-
-.badge-agotado {
-  color: #a92a30;
-  background-color: #ffe6e8;
-}
-
-.badge-no-disponible {
-  color: #7a5a3c;
-  background-color: #fff4e7;
-}
-
-.flex-container {
+.box-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  margin-bottom: 10px;
 }
 
-.flex-container h5,
-.flex-container span {
-  margin: 0;
-  color: #2d4a48;
-  font-size: 0.95rem;
+.box-actions {
+  display: flex;
+  justify-content: end;
+  gap: 5px;
 }
 
-.card-row strong,
-.card-row span:last-child {
-  color: #052f30;
-  font-weight: 700;
+.status {
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
 }
 
-.btn-block {
-  width: 100%;
-  margin-top: 1rem;
+.status-0 {
+  background-color: #88e04f;
+  color: #29611c;
+}
+
+.status-1 {
+  background-color: #ffb79a;
+  color: #9c2b1b;
+}
+
+.status-2 {
+  background-color: #f4a100;
+  color: white;
+}
+
+@media (max-width: 500px) {
+  .box-list {
+    grid-template-columns: auto;
+  }
 }
