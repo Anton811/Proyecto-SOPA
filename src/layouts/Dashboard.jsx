@@ -79,7 +79,9 @@ export default function Dashboard() {
       const { data, error } = await supabase.from("products").delete().eq("id", id);
       if (error) return console.error("Error al borrar producto:", error);
 
-      return alert(`${name} eliminado correctamente`);
+      alert(`${name} eliminado correctamente`);
+      insertProducts();
+      return;
     }
   };
 
