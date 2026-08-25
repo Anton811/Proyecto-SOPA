@@ -97,7 +97,9 @@ export default function Dashboard() {
         <div className="box-list">
           {product.map((product) => (
             <Box key={product.id}>
-              <h1>{product.name}</h1>
+              <a href={`/product/${product.id}`} className="link-products">
+                <h1>{product.name}</h1>
+              </a>
               <div className="box-row">
                 <span className={`status status-${product.status}`}>
                   {status[product.status]}
