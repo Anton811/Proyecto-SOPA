@@ -1,77 +1,137 @@
-* {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: #18302d;
+  background: #f4f7f2;
+  --ink: #18302d;
+  --muted: #687773;
+  --brand: #087f6d;
+  --brand-dark: #075b51;
+  --surface: #ffffff;
+  --line: #dce7e1;
+  --danger: #b84b42;
 }
 
-p {
-  font-family: sans-serif;
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: #effef9;
+  min-width: 320px;
+  min-height: 100vh;
   margin: 0;
+  background: radial-gradient(circle at 10% 0%, #e3f2ea 0, transparent 34rem), #f4f7f2;
+}
+
+h1,
+p {
+  margin-top: 0;
+}
+
+p {
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .input {
   width: 100%;
-  height: 25px;
-  border: 0;
-  border: 1px solid grey;
-  border-radius: 5px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fbfdfb;
+  color: var(--ink);
+  font: inherit;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
 }
 
 .input:focus {
   outline: none;
-  border: 0;
-  border-bottom: 2px solid #069b83;
+  border-color: var(--brand);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(8, 127, 109, 0.14);
 }
 
 .btn {
-  border-radius: 20px;
-  padding: 10px;
-  font-weight: bold;
-  border: 2px solid white;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 .btn-primary {
-  background-color: #069b83;
+  background: var(--brand);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: white;
-  color: #069b83;
-  border: 2px solid #069b83;
+  background: var(--brand-dark);
 }
 
 .btn-secondary {
-  background-color: white;
-  color: #069b83;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  color: white;
 }
 
 .btn-secondary:hover {
-  background-color: #069b83;
-  color: white;
-  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .btn-cancel {
-  background-color: red;
-  color: white;
+  background: #fff1ef;
+  color: var(--danger);
 }
 
 .btn-cancel:hover {
-  background-color: white;
-  color: red;
-  border: 2px solid red;
+  background: #f9deda;
 }
 
 .textarea {
-  min-width: 100%;
-  height: 20dvh;
+  min-height: 130px;
+  resize: vertical;
 }
 
 .link-products {
-  color: black;
+  color: var(--ink);
   text-decoration: none;
+}
+
+.link-products:hover {
+  color: var(--brand);
+}
+
+.dashboard-intro {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 46px 28px 12px;
+}
+
+.dashboard-intro h1 {
+  margin-bottom: 8px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -0.03em;
+}
+
+.dashboard-intro p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .dashboard-intro {
+    padding: 32px 20px 8px;
+  }
 }

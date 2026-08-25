@@ -1,24 +1,47 @@
 .box-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 20px;
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 28px 48px;
+  gap: 18px;
 }
 
 .box {
-  background-color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 2px 2px 7px gray;
+  background: white;
+  padding: 24px;
+  border: 1px solid #e3ece7;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(24, 48, 45, 0.06);
   display: flex;
   flex-direction: column;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(24, 48, 45, 0.1);
+}
+
+.box h1 {
+  margin-bottom: 22px;
+  font-size: 1.25rem;
 }
 
 .box-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  color: #687773;
+  font-size: 0.94rem;
+}
+
+.box-row strong {
+  color: #18302d;
+  font-size: 1.05rem;
 }
 
 .box-actions {
@@ -29,28 +52,30 @@
 
 .status {
   font-weight: bold;
-  padding: 10px;
-  border-radius: 20px;
-  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
 }
 
 .status-0 {
-  background-color: #88e04f;
-  color: #29611c;
+  background-color: #e0f3e6;
+  color: #247044;
 }
 
 .status-1 {
-  background-color: #ffb79a;
-  color: #9c2b1b;
+  background-color: #fff0df;
+  color: #9a5d1c;
 }
 
 .status-2 {
-  background-color: #f4a100;
-  color: white;
+  background-color: #fbe3df;
+  color: #a33f35;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 700px) {
   .box-list {
-    grid-template-columns: auto;
+    grid-template-columns: 1fr;
+    padding: 16px 20px 32px;
   }
 }
