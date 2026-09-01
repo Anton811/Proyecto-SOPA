@@ -6,16 +6,31 @@ import { supabase } from "../utils/supabase";
 
 export default function Dashboard() {
   const status = ["Disponible", "Pendiente", "No disponible"];
-  const category = ["Electronica", "Ropa", "Hogar", "Salud"];
   const priority = ["Media", "Alta", "Baja"];
   const navigate = useNavigate();
 
   const [product, setProduct] = useState([]);
+  const [containers, setContainers] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeView, setActiveView] = useState("products");
+  const [isContainerModalOpen, setIsContainerModalOpen] = useState(false);
+  const [newContainerName, setNewContainerName] = useState("");
+  const [productSearch, setProductSearch] = useState("");
+  const [productFilters, setProductFilters] = useState({
+    category: "all",
+    status: "all",
+    priority: "all",
+  });
+  const [collectionSearch, setCollectionSearch] = useState("");
 
   useEffect(() => {
-    insertProducts();
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    await Promise.all([insertProducts(), getContainers(), getCategories()]);
+  };
 
   const insertProducts = async () => {
     try {
@@ -34,6 +49,42 @@ export default function Dashboard() {
       setProduct([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getContainers = async () => {
+    try {
+      const user = await getUser();
+      const { data, error } = await supabase
+        .from("container")
+        .select("*")
+        .eq("id_user", user)
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+
+      setContainers(data || []);
+    } catch (error) {
+      console.error("error en solicitud de contenedores", error);
+      setContainers([]);
+    }
+  };
+
+  const getCategories = async () => {
+    try {
+      const user = await getUser();
+      const { data, error } = await supabase
+        .from("categorys")
+        .select("*")
+        .eq("id_user", user)
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+
+      setCategories(data || []);
+    } catch (error) {
+      console.error("error en solicitud de categorías", error);
+      setCategories([]);
     }
   };
 
@@ -59,6 +110,74 @@ export default function Dashboard() {
     }
   };
 
+  const handleCreateContainer = async () => {
+    const name = newContainerName.trim();
+
+    if (!name) {
+      alert("Escribe un nombre para la colección");
+      return;
+    }
+
+    try {
+      const user = await getUser();
+      const { error } = await supabase.from("container").insert({
+        id_user: user,
+        name,
+      });
+
+      if (error) throw error;
+
+      setNewContainerName("");
+      setIsContainerModalOpen(false);
+      getContainers();
+    } catch (error) {
+      console.error("Error al crear colección:", error);
+      alert("No se pudo crear la colección");
+    }
+  };
+
+  const getProductCountByContainer = (containerId) => {
+    return product.filter((item) => item.container === containerId).length;
+  };
+
+  const getCategoryName = (categoryId) => {
+    if (categoryId === null || categoryId === undefined || categoryId === "") {
+      return "Sin categoría";
+    }
+
+    const categoryMatch = categories.find((item) => Number(item.id) === Number(categoryId));
+    return categoryMatch ? categoryMatch.name : "Sin categoría";
+  };
+
+  const filteredProducts = product.filter((item) => {
+    const searchValue = productSearch.trim().toLowerCase();
+    const matchesSearch =
+      searchValue.length === 0 || item.name?.toLowerCase().includes(searchValue);
+
+    const matchesCategory =
+      productFilters.category === "all" ||
+      Number(item.category) === Number(productFilters.category);
+
+    const matchesStatus =
+      productFilters.status === "all" || Number(item.status) === Number(productFilters.status);
+
+    const matchesPriority =
+      productFilters.priority === "all" ||
+      Number(item.priority) === Number(productFilters.priority);
+
+    return matchesSearch && matchesCategory && matchesStatus && matchesPriority;
+  });
+
+  const filteredCollections = containers.filter((container) => {
+    const searchValue = collectionSearch.trim().toLowerCase();
+    return searchValue.length === 0 || container.name?.toLowerCase().includes(searchValue);
+  });
+
+  const resetProductFilters = () => {
+    setProductSearch("");
+    setProductFilters({ category: "all", status: "all", priority: "all" });
+  };
+
   return (
     <>
       <Nav />
@@ -76,65 +195,288 @@ export default function Dashboard() {
           </button>
         </section>
 
-        {isLoading ? (
-          <div className="dashboard-empty">
-            <p>Cargando tus productos...</p>
-          </div>
-        ) : product.length === 0 ? (
-          <div className="dashboard-empty dashboard-empty--featured">
-            <h2>Aún no tienes productos guardados</h2>
-            <p>Empieza a crear tu primera lista con los artículos que más te gusten.</p>
-            <button className="btn btn-primary" onClick={() => navigate("/product/add")}>
-              Añadir mi primer producto
-            </button>
-          </div>
-        ) : (
-          <div className="box-list">
-            {product.map((product) => (
-              <Box key={product.id}>
-                <a href={`/product/${product.id}`} className="link-products">
-                  <h1>{product.name}</h1>
-                </a>
-                <div className="box-row">
-                  <span className={`status status-${product.status}`}>
-                    {status[product.status]}
-                  </span>
-                </div>
+        <div className="dashboard-view-switcher">
+          <button
+            type="button"
+            className={`view-tab ${activeView === "products" ? "active" : ""}`}
+            onClick={() => setActiveView("products")}
+          >
+            Productos
+          </button>
+          <button
+            type="button"
+            className={`view-tab ${activeView === "containers" ? "active" : ""}`}
+            onClick={() => setActiveView("containers")}
+          >
+            Colecciones
+          </button>
+        </div>
 
-                <div className="box-row">
-                  <span>Precio:</span>
-                  <strong>${product.price}</strong>
-                </div>
+        <div className="dashboard-layout">
+          {activeView === "products" ? (
+            <div className="dashboard-main-content dashboard-main-content--full">
+              <div className="dashboard-toolbar">
+                <input
+                  type="text"
+                  className="input toolbar-search"
+                  value={productSearch}
+                  onChange={(event) => setProductSearch(event.target.value)}
+                  placeholder="Buscar producto por nombre"
+                />
 
-                <div className="box-row">
-                  <span>Categoria:</span>
-                  <span>{category[product.category]}</span>
-                </div>
-
-                <div className="box-row">
-                  <span>Importancia:</span>
-                  <span>{priority[product.priority]}</span>
-                </div>
-
-                <div className="box-actions">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => navigate(`/product/${product.id}`)}
+                <div className="filters-row">
+                  <select
+                    className="input filter-select"
+                    value={productFilters.category}
+                    onChange={(event) =>
+                      setProductFilters((current) => ({
+                        ...current,
+                        category: event.target.value,
+                      }))
+                    }
                   >
-                    Ver más
-                  </button>
+                    <option value="all">Todas las categorías</option>
+                    {categories.map((categoryItem) => (
+                      <option key={categoryItem.id} value={categoryItem.id}>
+                        {categoryItem.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="input filter-select"
+                    value={productFilters.status}
+                    onChange={(event) =>
+                      setProductFilters((current) => ({
+                        ...current,
+                        status: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="all">Todos los estados</option>
+                    {status.map((label, index) => (
+                      <option key={label} value={index}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="input filter-select"
+                    value={productFilters.priority}
+                    onChange={(event) =>
+                      setProductFilters((current) => ({
+                        ...current,
+                        priority: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="all">Toda la importancia</option>
+                    {priority.map((label, index) => (
+                      <option key={label} value={index}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+
                   <button
+                    type="button"
                     className="btn btn-cancel"
-                    onClick={() => handleDelete(product.id, product.name)}
+                    onClick={resetProductFilters}
                   >
-                    Eliminar
+                    Limpiar
                   </button>
                 </div>
-              </Box>
-            ))}
-          </div>
-        )}
+              </div>
+
+              {isLoading ? (
+                <div className="dashboard-empty">
+                  <p>Cargando tus productos...</p>
+                </div>
+              ) : product.length === 0 ? (
+                <div className="dashboard-empty dashboard-empty--featured">
+                  <h2>Aún no tienes productos guardados</h2>
+                  <p>Empieza a crear tu primera lista con los artículos que más te gusten.</p>
+                  <button className="btn btn-primary" onClick={() => navigate("/product/add")}>
+                    Añadir mi primer producto
+                  </button>
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <div className="dashboard-empty dashboard-empty--featured">
+                  <h2>No hay productos con esos filtros</h2>
+                  <p>
+                    Prueba cambiar el nombre o limpiar los filtros para ver más resultados.
+                  </p>
+                  <button className="btn btn-primary" onClick={resetProductFilters}>
+                    Limpiar filtros
+                  </button>
+                </div>
+              ) : (
+                <div className="box-list">
+                  {filteredProducts.map((productItem) => (
+                    <Box key={productItem.id}>
+                      <a href={`/product/${productItem.id}`} className="link-products">
+                        <h1>{productItem.name}</h1>
+                      </a>
+                      <div className="box-row">
+                        <span className={`status status-${productItem.status}`}>
+                          {status[productItem.status]}
+                        </span>
+                      </div>
+
+                      <div className="box-row">
+                        <span>Precio:</span>
+                        <strong>${productItem.price}</strong>
+                      </div>
+
+                      <div className="box-row">
+                        <span>Categoría:</span>
+                        <span>{getCategoryName(productItem.category)}</span>
+                      </div>
+
+                      <div className="box-row">
+                        <span>Importancia:</span>
+                        <span>{priority[productItem.priority]}</span>
+                      </div>
+
+                      <div className="box-actions">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => navigate(`/product/${productItem.id}`)}
+                        >
+                          Ver más
+                        </button>
+                        <button
+                          className="btn btn-cancel"
+                          onClick={() => handleDelete(productItem.id, productItem.name)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </Box>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="dashboard-main-content dashboard-main-content--full">
+              <div className="collections-panel">
+                <div className="collections-header">
+                  <div>
+                    <h2>Colecciones</h2>
+                    <p>Organiza tus deseos por grupo o tema.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-small"
+                    onClick={() => setIsContainerModalOpen(true)}
+                  >
+                    + Nueva colección
+                  </button>
+                </div>
+
+                <div className="dashboard-toolbar dashboard-toolbar--compact">
+                  <input
+                    type="text"
+                    className="input toolbar-search"
+                    value={collectionSearch}
+                    onChange={(event) => setCollectionSearch(event.target.value)}
+                    placeholder="Buscar colección por nombre"
+                  />
+                </div>
+
+                {containers.length === 0 ? (
+                  <div className="dashboard-empty dashboard-empty--featured">
+                    <h2>Aún no tienes colecciones</h2>
+                    <p>Crea tu primera categoría para ordenar mejor tus ideas.</p>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => setIsContainerModalOpen(true)}
+                    >
+                      Crear colección
+                    </button>
+                  </div>
+                ) : filteredCollections.length === 0 ? (
+                  <div className="dashboard-empty dashboard-empty--featured">
+                    <h2>No se encontraron colecciones</h2>
+                    <p>Prueba con otro nombre o limpia la búsqueda.</p>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => setCollectionSearch("")}
+                    >
+                      Limpiar búsqueda
+                    </button>
+                  </div>
+                ) : (
+                  <div className="collections-grid">
+                    {filteredCollections.map((container) => {
+                      const productCount = getProductCountByContainer(container.id);
+
+                      return (
+                        <div
+                          key={container.id}
+                          className="collection-card"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => navigate(`/collection/${container.id}`)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              navigate(`/collection/${container.id}`);
+                            }
+                          }}
+                        >
+                          <div className="collection-card__meta">Colección</div>
+                          <h3>{container.name}</h3>
+                          <p>
+                            {productCount} producto{productCount === 1 ? "" : "s"} guardado
+                            {productCount === 1 ? "" : "s"}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </main>
+
+      {isContainerModalOpen && (
+        <div className="modal-backdrop" onClick={() => setIsContainerModalOpen(false)}>
+          <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <h3>Crear colección</h3>
+            <label className="modal-label">
+              Nombre de la colección
+              <input
+                type="text"
+                className="input"
+                value={newContainerName}
+                onChange={(event) => setNewContainerName(event.target.value)}
+                placeholder="Ej. Regalos, Casa, Viajes"
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={() => setIsContainerModalOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleCreateContainer}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

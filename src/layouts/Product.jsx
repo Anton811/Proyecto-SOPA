@@ -9,14 +9,20 @@ export default function Product() {
   const navigate = useNavigate();
   const [product, setProduct] = useState({});
   const [initialProduct, setInitialProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [selectedCollection, setSelectedCollection] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [modify, setModify] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState("");
 
   useEffect(() => {
     searchData();
-    setIsLoading(false);
-  }, []);
+  }, [id]);
 
   const getUser = async () => {
     const {
@@ -27,22 +33,68 @@ export default function Product() {
 
     if (user) return user.id;
   };
+
+  const loadLookups = async () => {
+    const user = await getUser();
+
+    if (!user) return { nextCategories: [], nextCollections: [] };
+
+    const [categoriesResult, collectionsResult] = await Promise.all([
+      supabase
+        .from("categorys")
+        .select("*")
+        .eq("id_user", user)
+        .order("name", { ascending: true }),
+      supabase
+        .from("container")
+        .select("*")
+        .eq("id_user", user)
+        .order("name", { ascending: true }),
+    ]);
+
+    if (categoriesResult.error) {
+      console.error("Error al cargar categorías:", categoriesResult.error);
+    }
+
+    if (collectionsResult.error) {
+      console.error("Error al cargar colecciones:", collectionsResult.error);
+    }
+
+    const nextCategories = categoriesResult.data || [];
+    const nextCollections = collectionsResult.data || [];
+
+    setCategories(nextCategories);
+    setCollections(nextCollections);
+
+    return { nextCategories, nextCollections };
+  };
+
   const searchData = async () => {
-    if (id === "add") {
+    const isCreateMode = id === "add";
+    setIsLoading(true);
+    setModify(isCreateMode);
+    setSelectedCollection("");
+
+    const { nextCategories, nextCollections } = await loadLookups();
+
+    if (isCreateMode) {
       const newProduct = {
         id_user: await getUser(),
         name: "",
         price: "",
         status: 1,
-        category: 1,
+        category: nextCategories[0]?.id ?? "",
         priority: 1,
         url: "",
         description: "",
+        container: null,
       };
 
       setProduct(newProduct);
       setInitialProduct(newProduct);
       setModify(true);
+      setSelectedCollection("");
+      setIsLoading(false);
       return;
     }
 
@@ -50,17 +102,29 @@ export default function Product() {
 
     if (error) return console.error("Error:", error);
 
-    setProduct(data[0]);
-    setInitialProduct(data[0]);
+    const productData = data?.[0];
+    setProduct(productData || {});
+    setInitialProduct(productData || null);
+    setSelectedCollection(productData?.container ? String(productData.container) : "");
     setModify(false);
+    setIsLoading(false);
   };
   const handleChange = (event) => {
     const { name, value } = event.target;
-    const numericFields = ["price", "status", "category", "priority"];
+    const numericFields = ["price", "status", "priority"];
+    const optionalNumericFields = ["category", "container"];
 
     setProduct((current) => ({
       ...current,
-      [name]: numericFields.includes(name) ? Number(value) : value,
+      [name]: numericFields.includes(name)
+        ? value === ""
+          ? null
+          : Number(value)
+        : optionalNumericFields.includes(name)
+          ? value === ""
+            ? null
+            : Number(value)
+          : value,
     }));
   };
 
@@ -80,12 +144,30 @@ export default function Product() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const payload = { ...product };
+
+    if (
+      payload.category === null ||
+      payload.category === undefined ||
+      payload.category === ""
+    ) {
+      payload.category = null;
+    } else if (categories.length > 0 && !payload.category) {
+      payload.category = categories[0].id;
+    }
+
+    if (selectedCollection && selectedCollection !== "") {
+      payload.container = Number(selectedCollection);
+    } else {
+      payload.container = null;
+    }
+
     let result;
 
     if (id == "add") {
-      result = await supabase.from("products").insert(product).select();
+      result = await supabase.from("products").insert(payload).select();
     } else {
-      result = await supabase.from("products").update(product).eq("id", id).select();
+      result = await supabase.from("products").update(payload).eq("id", id).select();
     }
 
     const { data, error } = result;
@@ -95,6 +177,68 @@ export default function Product() {
     if (data) navigate("/dashboard");
   };
 
+  const handleCreateCategory = async () => {
+    const name = newCategoryName.trim();
+
+    if (!name) {
+      alert("Escribe un nombre para la categoría");
+      return;
+    }
+
+    try {
+      const user = await getUser();
+      const { data, error } = await supabase
+        .from("categorys")
+        .insert({ id_user: user, name })
+        .select();
+
+      if (error) throw error;
+
+      const createdCategory = data?.[0];
+      setCategories((current) =>
+        [...current, createdCategory].sort((a, b) => a.name.localeCompare(b.name)),
+      );
+      setProduct((current) => ({ ...current, category: createdCategory.id }));
+      setNewCategoryName("");
+      setIsCategoryModalOpen(false);
+    } catch (error) {
+      console.error("Error al crear categoría:", error);
+      alert("No se pudo crear la categoría");
+    }
+  };
+
+  const handleCreateCollection = async () => {
+    const name = newCollectionName.trim();
+
+    if (!name) {
+      alert("Escribe un nombre para la colección");
+      return;
+    }
+
+    try {
+      const user = await getUser();
+      const { data, error } = await supabase
+        .from("container")
+        .insert({ id_user: user, name })
+        .select();
+
+      if (error) throw error;
+
+      const createdCollection = data?.[0];
+      setCollections((current) =>
+        [...current, createdCollection].sort((a, b) => a.name.localeCompare(b.name)),
+      );
+      setSelectedCollection(String(createdCollection.id));
+      setNewCollectionName("");
+      setIsCollectionModalOpen(false);
+    } catch (error) {
+      console.error("Error al crear colección:", error);
+      alert("No se pudo crear la colección");
+    }
+  };
+
+  const pageTitle = id === "add" ? "Agregar nuevo producto" : "Información del producto";
+
   return (
     <>
       <Nav />
@@ -102,7 +246,7 @@ export default function Product() {
         <div className="form-box">
           {isLoading === false ? (
             <>
-              <h1>Crear nuevo producto</h1>
+              <h1>{pageTitle}</h1>
               <form className="product-form" onSubmit={handleSubmit}>
                 <label>
                   Nombre del producto
@@ -185,21 +329,66 @@ export default function Product() {
                 </div>
 
                 <div className="row">
-                  <label>
+                  <label className="field-with-action">
                     Categoría
-                    <select
-                      name="category"
-                      value={product.category}
-                      onChange={handleChange}
-                      className="input"
-                      disabled={!modify}
-                    >
-                      <option value={0}>Electrónica</option>
-                      <option value={1}>Ropa</option>
-                      <option value={2}>Hogar</option>
-                      <option value={3}>Salud</option>
-                    </select>
+                    <div className="input-with-button">
+                      <select
+                        name="category"
+                        value={product.category ?? ""}
+                        onChange={handleChange}
+                        className="input"
+                        disabled={!modify || categories.length === 0}
+                      >
+                        {categories.length === 0 ? (
+                          <option value="">Sin categorías</option>
+                        ) : (
+                          categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                      <button
+                        type="button"
+                        className="btn btn-primary input-action-btn"
+                        onClick={() => setIsCategoryModalOpen(true)}
+                        disabled={!modify}
+                      >
+                        +
+                      </button>
+                    </div>
                   </label>
+                  <label className="field-with-action">
+                    Colección
+                    <div className="input-with-button">
+                      <select
+                        name="container"
+                        value={selectedCollection}
+                        onChange={(event) => setSelectedCollection(event.target.value)}
+                        className="input"
+                        disabled={!modify || collections.length === 0}
+                      >
+                        <option value="">Sin colección</option>
+                        {collections.map((collection) => (
+                          <option key={collection.id} value={collection.id}>
+                            {collection.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        className="btn btn-primary input-action-btn"
+                        onClick={() => setIsCollectionModalOpen(true)}
+                        disabled={!modify}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="row">
                   <label>
                     Importancia
                     <div className="status-list">
@@ -335,6 +524,72 @@ export default function Product() {
           )}
         </div>
       </main>
+
+      {isCategoryModalOpen && (
+        <div className="modal-backdrop" onClick={() => setIsCategoryModalOpen(false)}>
+          <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <h3>Crear categoría</h3>
+            <label className="modal-label">
+              Nombre de la categoría
+              <input
+                type="text"
+                className="input"
+                value={newCategoryName}
+                onChange={(event) => setNewCategoryName(event.target.value)}
+                placeholder="Ej. Tecnología, Libros, Regalos"
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={() => setIsCategoryModalOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button type="button" className="btn btn-primary" onClick={handleCreateCategory}>
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isCollectionModalOpen && (
+        <div className="modal-backdrop" onClick={() => setIsCollectionModalOpen(false)}>
+          <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <h3>Crear colección</h3>
+            <label className="modal-label">
+              Nombre de la colección
+              <input
+                type="text"
+                className="input"
+                value={newCollectionName}
+                onChange={(event) => setNewCollectionName(event.target.value)}
+                placeholder="Ej. Casa, Viajes, Regalos"
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={() => setIsCollectionModalOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleCreateCollection}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

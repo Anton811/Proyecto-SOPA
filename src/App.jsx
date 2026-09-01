@@ -4,6 +4,7 @@ import Login from "./layouts/Login";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "./layouts/Dashboard";
 import Product from "./layouts/Product";
+import Collection from "./layouts/Collection";
 import { supabase } from "./utils/supabase";
 
 function ProtectedRoute({ children }) {
@@ -128,6 +129,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Product />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/collection/:id"
+          element={
+            <ProtectedRoute>
+              <Collection />
             </ProtectedRoute>
           }
         />
