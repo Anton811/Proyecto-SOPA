@@ -8,7 +8,9 @@ export default function Product() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState({});
+  const [initialProduct, setInitialProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [modify, setModify] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
@@ -26,29 +28,53 @@ export default function Product() {
     if (user) return user.id;
   };
   const searchData = async () => {
-    if (id === "add")
-      return setProduct({
+    if (id === "add") {
+      const newProduct = {
         id_user: await getUser(),
         name: "",
         price: "",
         status: 1,
         category: 1,
         priority: 1,
+        url: "",
         description: "",
-      });
+      };
+
+      setProduct(newProduct);
+      setInitialProduct(newProduct);
+      setModify(true);
+      return;
+    }
 
     const { data, error } = await supabase.from("products").select("*").eq("id", id);
 
     if (error) return console.error("Error:", error);
 
     setProduct(data[0]);
+    setInitialProduct(data[0]);
+    setModify(false);
   };
   const handleChange = (event) => {
     const { name, value } = event.target;
+    const numericFields = ["price", "status", "category", "priority"];
+
     setProduct((current) => ({
       ...current,
-      [name]: value,
+      [name]: numericFields.includes(name) ? Number(value) : value,
     }));
+  };
+
+  const handleCancel = () => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+    }
+    setModify(false);
+  };
+
+  const handleModify = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setModify(true);
   };
 
   const handleSubmit = async (event) => {
@@ -88,6 +114,7 @@ export default function Product() {
                     placeholder="Ej. IPhone 17 Pro Max"
                     autoComplete="off"
                     className="input"
+                    disabled={!modify}
                     required
                   />
                 </label>
@@ -102,20 +129,58 @@ export default function Product() {
                       onChange={handleChange}
                       placeholder="15000"
                       className="input"
+                      disabled={!modify}
                     />
                   </label>
                   <label>
-                    Estatus
-                    <select
-                      name="status"
-                      value={product.status}
-                      onChange={handleChange}
-                      className="input"
-                    >
-                      <option value={0}>Disponible</option>
-                      <option value={1}>No disponible</option>
-                      <option value={2}>Agotado</option>
-                    </select>
+                    Estado
+                    <div className="status-list">
+                      <label
+                        className={`status-option status-option--available ${
+                          product.status === 0 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="status"
+                          value={0}
+                          checked={product.status === 0}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>Disponible</span>
+                      </label>
+                      <label
+                        className={`status-option status-option--unavailable ${
+                          product.status === 1 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="status"
+                          value={1}
+                          checked={product.status === 1}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>Pendiente</span>
+                      </label>
+                      <label
+                        className={`status-option status-option--out ${
+                          product.status === 2 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="status"
+                          value={2}
+                          checked={product.status === 2}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>No disponible</span>
+                      </label>
+                    </div>
                   </label>
                 </div>
 
@@ -127,6 +192,7 @@ export default function Product() {
                       value={product.category}
                       onChange={handleChange}
                       className="input"
+                      disabled={!modify}
                     >
                       <option value={0}>Electrónica</option>
                       <option value={1}>Ropa</option>
@@ -135,42 +201,128 @@ export default function Product() {
                     </select>
                   </label>
                   <label>
-                    Prioridad
-                    <select
-                      name="priority"
-                      value={product.priority}
-                      onChange={handleChange}
-                      className="input"
-                    >
-                      <option value={0}>Normal</option>
-                      <option value={1}>Urgente</option>
-                      <option value={2}>Baja</option>
-                    </select>
+                    Importancia
+                    <div className="status-list">
+                      <label
+                        className={`status-option status-option--available ${
+                          product.priority === 0 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="priority"
+                          value={0}
+                          checked={product.priority === 0}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>Media</span>
+                      </label>
+                      <label
+                        className={`status-option status-option--unavailable ${
+                          product.priority === 1 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="priority"
+                          value={1}
+                          checked={product.priority === 1}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>Alta</span>
+                      </label>
+                      <label
+                        className={`status-option status-option--out ${
+                          product.priority === 2 ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="priority"
+                          value={2}
+                          checked={product.priority === 2}
+                          onChange={handleChange}
+                          disabled={!modify}
+                        />
+                        <span>Baja</span>
+                      </label>
+                    </div>
                   </label>
                 </div>
 
                 <label>
-                  Descripción
+                  URL
+                  {!modify ? (
+                    product.url ? (
+                      <a
+                        href={
+                          product.url.startsWith("http")
+                            ? product.url
+                            : `https://${product.url}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="product-url-link"
+                      >
+                        {product.url}
+                      </a>
+                    ) : (
+                      <span className="product-url-placeholder">Sin enlace</span>
+                    )
+                  ) : (
+                    <input
+                      type="url"
+                      name="url"
+                      value={product.url || ""}
+                      onChange={handleChange}
+                      placeholder="https://ejemplo.com"
+                      className="input"
+                    />
+                  )}
+                </label>
+
+                <label>
+                  Nota personal
                   <textarea
                     name="description"
                     value={product.description}
                     onChange={handleChange}
-                    placeholder="Describe las características del producto"
+                    placeholder="Escribe una nota o detalle personal sobre este producto"
                     className="textarea input"
+                    disabled={!modify}
                   />
                 </label>
 
                 <div className="form-actions">
-                  <button type="submit" className="btn btn-primary">
-                    Guardar producto
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Cancelar
-                  </button>
+                  {modify ? (
+                    <>
+                      <button type="button" className="btn btn-cancel" onClick={handleCancel}>
+                        Cancelar
+                      </button>
+                      <button type="submit" className="btn btn-primary">
+                        Guardar producto
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-cancel"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          navigate(-1);
+                        }}
+                      >
+                        Regresar
+                      </button>
+                      <button type="button" className="btn btn-primary" onClick={handleModify}>
+                        Modificar producto
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 {successMessage && <p>{successMessage}</p>}

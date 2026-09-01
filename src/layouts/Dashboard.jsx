@@ -4,63 +4,37 @@ import Nav from "../components/Nav";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 
-const products = [
-  {
-    id: 1,
-    name: "IPhone 17 Pro Max",
-    price: "$15,000",
-    status: "Disponible",
-    category: "Electrónica",
-    priority: "Urgente",
-  },
-  {
-    id: 2,
-    name: "Auriculares Inalámbricos X2",
-    price: "$2,499",
-    status: "Disponible",
-    category: "Accesorios",
-    priority: "Normal",
-  },
-  {
-    id: 3,
-    name: "Smartwatch Pulsar",
-    price: "$4,200",
-    status: "Agotado",
-    category: "Wearables",
-    priority: "Alta",
-  },
-  {
-    id: 4,
-    name: "Tablet Nova 12",
-    price: "$8,300",
-    status: "Disponible",
-    category: "Electrónica",
-    priority: "Normal",
-  },
-];
-
 export default function Dashboard() {
-  const status = ["Disponible", "No disponible", "Agotado"];
+  const status = ["Disponible", "Pendiente", "No disponible"];
   const category = ["Electronica", "Ropa", "Hogar", "Salud"];
-  const priority = ["Normal", "Urgente", "Baja"];
+  const priority = ["Media", "Alta", "Baja"];
   const navigate = useNavigate();
 
   const [product, setProduct] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     insertProducts();
   }, []);
 
   const insertProducts = async () => {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id_user", await getUser())
-      .order("time_created", { ascending: true });
+    try {
+      const user = await getUser();
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id_user", user)
+        .order("time_created", { ascending: true });
 
-    if (error) return console.error("error en solicitud de productos", error);
+      if (error) throw error;
 
-    if (data) setProduct(data);
+      setProduct(data || []);
+    } catch (error) {
+      console.error("error en solicitud de productos", error);
+      setProduct([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getUser = async () => {
@@ -90,54 +64,76 @@ export default function Dashboard() {
       <Nav />
       <main>
         <section className="dashboard-intro">
-          <h1>Productos disponibles</h1>
-          <p>Revisa el estado de los productos y abre la ficha para ver más detalles.</p>
+          <div>
+            <h1>Mi lista</h1>
+            <p>Guarda los productos que te gustaría tener, comparar o recordar más tarde.</p>
+          </div>
+          <button
+            className="btn btn-primary dashboard-add-btn"
+            onClick={() => navigate("/product/add")}
+          >
+            Agregar producto
+          </button>
         </section>
 
-        <div className="box-list">
-          {product.map((product) => (
-            <Box key={product.id}>
-              <a href={`/product/${product.id}`} className="link-products">
-                <h1>{product.name}</h1>
-              </a>
-              <div className="box-row">
-                <span className={`status status-${product.status}`}>
-                  {status[product.status]}
-                </span>
-              </div>
+        {isLoading ? (
+          <div className="dashboard-empty">
+            <p>Cargando tus productos...</p>
+          </div>
+        ) : product.length === 0 ? (
+          <div className="dashboard-empty dashboard-empty--featured">
+            <h2>Aún no tienes productos guardados</h2>
+            <p>Empieza a crear tu primera lista con los artículos que más te gusten.</p>
+            <button className="btn btn-primary" onClick={() => navigate("/product/add")}>
+              Añadir mi primer producto
+            </button>
+          </div>
+        ) : (
+          <div className="box-list">
+            {product.map((product) => (
+              <Box key={product.id}>
+                <a href={`/product/${product.id}`} className="link-products">
+                  <h1>{product.name}</h1>
+                </a>
+                <div className="box-row">
+                  <span className={`status status-${product.status}`}>
+                    {status[product.status]}
+                  </span>
+                </div>
 
-              <div className="box-row">
-                <span>Precio:</span>
-                <strong>${product.price}</strong>
-              </div>
+                <div className="box-row">
+                  <span>Precio:</span>
+                  <strong>${product.price}</strong>
+                </div>
 
-              <div className="box-row">
-                <span>Categoria:</span>
-                <span>{category[product.category]}</span>
-              </div>
+                <div className="box-row">
+                  <span>Categoria:</span>
+                  <span>{category[product.category]}</span>
+                </div>
 
-              <div className="box-row">
-                <span>Prioridad:</span>
-                <span>{priority[product.priority]}</span>
-              </div>
+                <div className="box-row">
+                  <span>Importancia:</span>
+                  <span>{priority[product.priority]}</span>
+                </div>
 
-              <div className="box-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => navigate(`/product/${product.id}`)}
-                >
-                  Ver más
-                </button>
-                <button
-                  className="btn btn-cancel"
-                  onClick={() => handleDelete(product.id, product.name)}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </Box>
-          ))}
-        </div>
+                <div className="box-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  >
+                    Ver más
+                  </button>
+                  <button
+                    className="btn btn-cancel"
+                    onClick={() => handleDelete(product.id, product.name)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </Box>
+            ))}
+          </div>
+        )}
       </main>
     </>
   );

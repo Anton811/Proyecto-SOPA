@@ -14,8 +14,8 @@ export default function Nav() {
   return (
     <nav className="app-nav">
       <div className="nav-brand">
-        <h1>Hola, Eduardo!</h1>
-        <p>Bienvenido al panel de SOPA.</p>
+        <h1>Tu lista</h1>
+        <p>Organiza tus deseos y productos favoritos.</p>
       </div>
 
       <div className="nav-actions">

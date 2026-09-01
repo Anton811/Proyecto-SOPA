@@ -58,7 +58,4 @@
   .nav-actions {
     justify-content: space-between;
   }
-  .nav-buttons {
-    flex-wrap: wrap;
-  }
 }

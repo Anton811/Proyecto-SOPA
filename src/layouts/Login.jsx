@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "../css/login.css";
 import "../css/global.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [input, setInput] = useState({});
 
   const handleChange = (e) => {
@@ -30,9 +31,16 @@ export default function Login() {
     <main className="login-main">
       <div className="login-card container">
         <header className="login-header">
+          <div className="login-brand">
+            <img src="/icon512_rounded.png" alt="Logo de la aplicación" />
+          </div>
           <h1 className="login-title">Inicio de Sesión</h1>
           <p className="login-sub">Accede a tu panel para gestionar la aplicación</p>
         </header>
+
+        {location.state?.message && (
+          <div className="login-alert">{location.state.message}</div>
+        )}
 
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="input-form">
