@@ -103,7 +103,10 @@ export default function Collection() {
       <main className="collection-page">
         {isLoading ? (
           <div className="dashboard-empty">
-            <p>Cargando colección...</p>
+            <div className="loading-state">
+              <span className="loading-spinner" aria-hidden="true" />
+              <span className="loading-message">Cargando colección</span>
+            </div>
           </div>
         ) : !collection ? (
           <div className="dashboard-empty dashboard-empty--featured">

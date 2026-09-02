@@ -540,7 +540,10 @@ export default function Product() {
             </>
           ) : (
             <>
-              <h1>Cargando informacion</h1>
+              <div className="loading-state">
+                <span className="loading-spinner" aria-hidden="true" />
+                <span className="loading-message">Cargando información</span>
+              </div>
             </>
           )}
         </div>

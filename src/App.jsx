@@ -13,6 +13,15 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
+function LoadingState({ message = "Cargando" }) {
+  return (
+    <div className="loading-state" role="status" aria-label={message}>
+      <span className="loading-spinner" aria-hidden="true" />
+      <span className="loading-message">{message}</span>
+    </div>
+  );
+}
+
 function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("sopa-theme");
@@ -66,7 +75,7 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <LoadingState message="Comprobando sesión" />;
   }
 
   if (!session) {
@@ -117,7 +126,7 @@ function PublicRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <LoadingState message="Preparando tu lista" />;
   }
 
   if (session) {

@@ -322,7 +322,10 @@ export default function Dashboard() {
 
               {isLoading ? (
                 <div className="dashboard-empty">
-                  <p>Cargando tus productos...</p>
+                  <div className="loading-state">
+                    <span className="loading-spinner" aria-hidden="true" />
+                    <span className="loading-message">Cargando tus productos</span>
+                  </div>
                 </div>
               ) : product.length === 0 ? (
                 <div className="dashboard-empty dashboard-empty--featured">
