@@ -110,6 +110,24 @@ export default function Dashboard() {
     }
   };
 
+  const handleToggleOwned = async (id, isChecked) => {
+    setProduct((current) =>
+      current.map((item) => (item.id === id ? { ...item, checked: isChecked } : item)),
+    );
+
+    const { error } = await supabase
+      .from("products")
+      .update({ checked: isChecked })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error al actualizar el estado del producto:", error);
+      setProduct((current) =>
+        current.map((item) => (item.id === id ? { ...item, checked: !isChecked } : item)),
+      );
+    }
+  };
+
   const handleCreateContainer = async () => {
     const name = newContainerName.trim();
 
@@ -139,6 +157,19 @@ export default function Dashboard() {
   const getProductCountByContainer = (containerId) => {
     return product.filter((item) => item.container === containerId).length;
   };
+
+  const getProductTotalByContainer = (containerId) => {
+    return product
+      .filter((item) => item.container === containerId)
+      .reduce((total, item) => total + (Number(item.price) || 0), 0);
+  };
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+      maximumFractionDigits: 2,
+    }).format(amount);
 
   const getCategoryName = (categoryId) => {
     if (categoryId === null || categoryId === undefined || categoryId === "") {
@@ -322,6 +353,26 @@ export default function Dashboard() {
                         <span className={`status status-${productItem.status}`}>
                           {status[productItem.status]}
                         </span>
+                        <label
+                          className={`owned-check ${productItem.checked ? "is-checked" : ""}`}
+                          title={
+                            productItem.checked
+                              ? "Marcar como pendiente"
+                              : "Marcar como adquirido"
+                          }
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={productItem.checked === true}
+                            onChange={(event) =>
+                              handleToggleOwned(productItem.id, event.target.checked)
+                            }
+                            aria-label={`${productItem.checked ? "Desmarcar" : "Marcar"} ${productItem.name} como adquirido`}
+                          />
+                          <span aria-hidden="true">✓</span>
+                          <span>{productItem.checked ? "Ya lo tengo" : "Lo quiero"}</span>
+                        </label>
                       </div>
 
                       <div className="box-row">
@@ -411,6 +462,7 @@ export default function Dashboard() {
                   <div className="collections-grid">
                     {filteredCollections.map((container) => {
                       const productCount = getProductCountByContainer(container.id);
+                      const productTotal = getProductTotalByContainer(container.id);
 
                       return (
                         <div
@@ -432,6 +484,9 @@ export default function Dashboard() {
                             {productCount} producto{productCount === 1 ? "" : "s"} guardado
                             {productCount === 1 ? "" : "s"}
                           </p>
+                          <strong className="collection-card__total">
+                            Valor total: {formatCurrency(productTotal)}
+                          </strong>
                         </div>
                       );
                     })}

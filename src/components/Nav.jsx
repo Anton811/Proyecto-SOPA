@@ -2,9 +2,11 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/nav.css";
 import { supabase } from "../utils/supabase";
+import { useTheme } from "../App";
 
 export default function Nav() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -13,9 +15,27 @@ export default function Nav() {
   };
   return (
     <nav className="app-nav">
-      <div className="nav-brand">
-        <h1>Tu lista</h1>
-        <p>Organiza tus deseos y productos favoritos.</p>
+      <div className="nav-top-row">
+        <div className="nav-brand">
+          <h1>Tu lista</h1>
+        </div>
+
+        <label
+          className="theme-control"
+          title={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
+        >
+          <span aria-hidden="true">☀</span>
+          <input
+            type="checkbox"
+            checked={theme === "dark"}
+            onChange={(event) => setTheme(event.target.checked ? "dark" : "light")}
+            aria-label={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
+          />
+          <span className="theme-switch" aria-hidden="true">
+            <span />
+          </span>
+          <span aria-hidden="true">☾</span>
+        </label>
       </div>
 
       <div className="nav-actions">

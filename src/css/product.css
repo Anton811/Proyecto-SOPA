@@ -9,8 +9,8 @@
 
 .form-box {
   width: min(100%, 720px);
-  background-color: white;
-  border: 1px solid #e3ece7;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
   box-shadow: 0 14px 35px rgba(24, 48, 45, 0.08);
   border-radius: 16px;
   padding: 34px;
@@ -68,10 +68,10 @@
 .product-form .input,
 .product-form .textarea {
   width: 100%;
-  border: 1px solid #d8e4e0;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background-color: #ffffff;
-  color: #163934;
+  background-color: var(--surface);
+  color: var(--ink);
   padding: 12px 14px;
   font: inherit;
   transition:
@@ -137,6 +137,59 @@
   margin-top: 8px;
 }
 
+.owned-toggle {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 12px !important;
+  padding: 13px 15px;
+  border: 1px solid #d8e8df;
+  border-radius: 12px;
+  background: #f5faf7;
+  color: #18302d;
+  cursor: pointer;
+}
+
+.owned-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.owned-toggle__mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border: 2px solid #9bbab0;
+  border-radius: 7px;
+  color: transparent;
+  font-weight: 800;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.owned-toggle input:checked + .owned-toggle__mark {
+  border-color: #087f6d;
+  background: #087f6d;
+  color: white;
+}
+
+.owned-toggle input:disabled ~ span {
+  cursor: not-allowed;
+}
+
+.owned-toggle small {
+  display: block;
+  margin-top: 2px;
+  color: #687773;
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -150,9 +203,9 @@
 
 .modal-card {
   width: min(100%, 420px);
-  background: white;
+  background: var(--surface);
   border-radius: 18px;
-  border: 1px solid #dfe9e6;
+  border: 1px solid var(--line);
   box-shadow: 0 22px 50px rgba(17, 27, 25, 0.2);
   padding: 24px;
 }

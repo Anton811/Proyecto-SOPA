@@ -1,42 +1,46 @@
 .app-nav {
-  display: flex;
-  position: static;
+  display: grid;
+  gap: 14px;
+  width: min(100%, 1180px);
   max-width: 1180px;
   margin: 0 auto;
+  padding: 14px 28px;
   background: #087f6d;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 28px;
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 14px 14px;
   box-shadow: 0 10px 24px rgba(7, 91, 81, 0.14);
 }
 
+.nav-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .nav-brand {
+  flex: 0 0 auto;
   color: white;
 }
 
 .nav-brand h1 {
-  margin-bottom: 3px;
-  font-size: 1.2rem;
-}
-
-.nav-brand p {
-  margin-bottom: 0;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 0.86rem;
+  margin: 0;
+  font-size: 1.15rem;
 }
 
 .nav-actions {
   display: flex;
-  gap: 10px;
   align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-width: 0;
 }
 
 .nav-link {
+  flex: 0 0 auto;
   text-decoration: none;
-  font-weight: bold;
+  font-size: 0.92rem;
+  font-weight: 700;
   color: white;
-  opacity: 0.84;
+  opacity: 0.9;
 }
 
 .nav-link:hover {
@@ -45,17 +49,92 @@
 
 .nav-buttons {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-control input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-switch {
+  display: flex;
+  align-items: center;
+  width: 42px;
+  height: 24px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  transition: background-color 160ms ease;
+}
+
+.theme-switch span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 160ms ease;
+}
+
+.theme-control input:checked + .theme-switch {
+  background: rgba(0, 0, 0, 0.36);
+}
+
+.theme-control input:checked + .theme-switch span {
+  transform: translateX(18px);
 }
 
 @media (max-width: 500px) {
   .app-nav {
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .nav-actions {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
-    padding: 18px 20px;
+    gap: 12px;
   }
+
+  .nav-link {
+    align-self: center;
+  }
+
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
+  .nav-buttons .btn {
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+}
+
+@media (min-width: 501px) and (max-width: 900px) {
+  .app-nav {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .nav-actions {
-    justify-content: space-between;
+    gap: 12px;
   }
 }

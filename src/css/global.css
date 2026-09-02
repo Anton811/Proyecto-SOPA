@@ -145,7 +145,7 @@ p {
   padding: 28px 24px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
   text-align: center;
   box-shadow: 0 8px 22px rgba(24, 48, 45, 0.04);
 }
@@ -161,7 +161,7 @@ p {
 
 .dashboard-empty--featured {
   padding: 42px 24px;
-  background: linear-gradient(180deg, #ffffff 0%, #f4faf7 100%);
+  background: linear-gradient(180deg, var(--surface) 0%, #f4faf7 100%);
 }
 
 .dashboard-view-switcher {
@@ -170,7 +170,7 @@ p {
   padding: 0 28px;
   display: inline-flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 6px;
@@ -231,7 +231,7 @@ p {
 }
 
 .collections-panel {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 24px;
@@ -301,6 +301,13 @@ p {
 
 .collection-card p {
   margin: 0;
+}
+
+.collection-card__total {
+  display: block;
+  margin-top: 10px;
+  color: var(--brand-dark);
+  font-size: 0.92rem;
 }
 
 .collection-page {
@@ -409,4 +416,69 @@ p {
   .filters-row {
     grid-template-columns: 1fr;
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e3eeea;
+    --muted: #a7bbb4;
+    --surface: #1d2b29;
+    --line: #38504a;
+    --brand-dark: #86d1bd;
+    color: var(--ink);
+  }
+}
+
+[data-theme="dark"] {
+  --ink: #e3eeea;
+  --muted: #a7bbb4;
+  --surface: #1d2b29;
+  --line: #38504a;
+  --brand-dark: #86d1bd;
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body {
+    background: radial-gradient(circle at 10% 0%, #25483f 0, transparent 34rem), #14201e;
+  }
+}
+
+[data-theme="dark"] body {
+  background: radial-gradient(circle at 10% 0%, #25483f 0, transparent 34rem), #14201e;
+}
+
+:root:not([data-theme="light"]) .box,
+[data-theme="dark"] .box,
+:root:not([data-theme="light"]) .form-box,
+[data-theme="dark"] .form-box,
+:root:not([data-theme="light"]) .modal-card,
+[data-theme="dark"] .modal-card {
+  background: #1d2b29;
+  border-color: #38504a;
+}
+
+:root:not([data-theme="light"]) .input,
+[data-theme="dark"] .input,
+:root:not([data-theme="light"]) .product-form .textarea,
+[data-theme="dark"] .product-form .textarea {
+  background-color: #243632;
+  border-color: #38504a;
+  color: var(--ink);
+}
+
+:root:not([data-theme="light"]) .collection-card,
+[data-theme="dark"] .collection-card {
+  background: linear-gradient(180deg, #263b36 0%, #1c302c 100%);
+  border-color: #38504a;
+}
+
+[data-theme="dark"] .dashboard-empty--featured {
+  background: linear-gradient(180deg, #1d2b29 0%, #203b34 100%);
+}
+
+[data-theme="dark"] .owned-toggle {
+  background: #203b34;
+  border-color: #38504a;
+  color: var(--ink);
 }

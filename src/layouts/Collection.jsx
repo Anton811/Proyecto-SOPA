@@ -75,6 +75,28 @@ export default function Collection() {
     }
   };
 
+  const handleToggleChecked = async (productId, isChecked) => {
+    setProducts((current) =>
+      current.map((product) =>
+        product.id === productId ? { ...product, checked: isChecked } : product,
+      ),
+    );
+
+    const { error } = await supabase
+      .from("products")
+      .update({ checked: isChecked })
+      .eq("id", productId);
+
+    if (error) {
+      console.error("Error al actualizar el estado del producto:", error);
+      setProducts((current) =>
+        current.map((product) =>
+          product.id === productId ? { ...product, checked: !isChecked } : product,
+        ),
+      );
+    }
+  };
+
   return (
     <>
       <Nav />
@@ -123,6 +145,24 @@ export default function Collection() {
                       <span className={`status status-${product.status}`}>
                         {status[product.status]}
                       </span>
+                      <label
+                        className={`owned-check ${product.checked ? "is-checked" : ""}`}
+                        title={
+                          product.checked ? "Marcar como pendiente" : "Marcar como adquirido"
+                        }
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={product.checked === true}
+                          onChange={(event) =>
+                            handleToggleChecked(product.id, event.target.checked)
+                          }
+                          aria-label={`${product.checked ? "Desmarcar" : "Marcar"} ${product.name} como adquirido`}
+                        />
+                        <span aria-hidden="true">✓</span>
+                        <span>{product.checked ? "Ya lo tengo" : "Lo quiero"}</span>
+                      </label>
                     </div>
 
                     <div className="box-row">

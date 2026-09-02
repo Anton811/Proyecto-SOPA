@@ -88,6 +88,7 @@ export default function Product() {
         url: "",
         description: "",
         container: null,
+        checked: false,
       };
 
       setProduct(newProduct);
@@ -110,21 +111,24 @@ export default function Product() {
     setIsLoading(false);
   };
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type, checked } = event.target;
     const numericFields = ["price", "status", "priority"];
     const optionalNumericFields = ["category", "container"];
 
     setProduct((current) => ({
       ...current,
-      [name]: numericFields.includes(name)
-        ? value === ""
-          ? null
-          : Number(value)
-        : optionalNumericFields.includes(name)
-          ? value === ""
-            ? null
-            : Number(value)
-          : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : numericFields.includes(name)
+            ? value === ""
+              ? null
+              : Number(value)
+            : optionalNumericFields.includes(name)
+              ? value === ""
+                ? null
+                : Number(value)
+              : value,
     }));
   };
 
@@ -440,6 +444,23 @@ export default function Product() {
                     </div>
                   </label>
                 </div>
+
+                <label className="owned-toggle">
+                  <input
+                    type="checkbox"
+                    name="checked"
+                    checked={product.checked === true}
+                    onChange={handleChange}
+                    disabled={!modify}
+                  />
+                  <span className="owned-toggle__mark" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span>
+                    <strong>Ya lo tengo</strong>
+                    <small>Marca este producto si ya lo compraste o ya lo tienes.</small>
+                  </span>
+                </label>
 
                 <label>
                   URL
