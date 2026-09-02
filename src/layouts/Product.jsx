@@ -19,6 +19,8 @@ export default function Product() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
+  const [isImportingUrl, setIsImportingUrl] = useState(false);
+  const [urlMessage, setUrlMessage] = useState("");
 
   useEffect(() => {
     searchData();
@@ -143,6 +145,39 @@ export default function Product() {
     event.preventDefault();
     event.stopPropagation();
     setModify(true);
+  };
+
+  const handleImportUrl = async () => {
+    const url = product.url?.trim();
+
+    if (!url) {
+      setUrlMessage("Escribe una URL para buscar sus datos");
+      return;
+    }
+
+    setIsImportingUrl(true);
+    setUrlMessage("");
+
+    try {
+      const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+      const result = await response.json();
+      const metadata = result.data;
+
+      if (!response.ok || !metadata?.title) throw new Error("No se encontraron datos");
+
+      setProduct((current) => ({
+        ...current,
+        name: current.name || metadata.title,
+        description: current.description || metadata.description || "",
+        price: current.price || Number(metadata.price) || current.price,
+      }));
+      setUrlMessage("Datos importados. Revisa la información antes de guardar.");
+    } catch (error) {
+      console.error("Error importando datos de URL:", error);
+      setUrlMessage("No se pudieron obtener datos de esta URL");
+    } finally {
+      setIsImportingUrl(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -482,14 +517,31 @@ export default function Product() {
                       <span className="product-url-placeholder">Sin enlace</span>
                     )
                   ) : (
-                    <input
-                      type="url"
-                      name="url"
-                      value={product.url || ""}
-                      onChange={handleChange}
-                      placeholder="https://ejemplo.com"
-                      className="input"
-                    />
+                    <>
+                      <div className="input-with-button">
+                        <input
+                          type="url"
+                          name="url"
+                          value={product.url || ""}
+                          onChange={handleChange}
+                          placeholder="https://ejemplo.com"
+                          className="input"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-primary import-url-btn"
+                          onClick={handleImportUrl}
+                          disabled={isImportingUrl}
+                        >
+                          {isImportingUrl ? "Buscando" : "Obtener datos"}
+                        </button>
+                      </div>
+                      {urlMessage && (
+                        <small className="url-message" role="status">
+                          {urlMessage}
+                        </small>
+                      )}
+                    </>
                   )}
                 </label>
 

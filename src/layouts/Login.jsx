@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../css/login.css";
 import "../css/global.css";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [input, setInput] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,15 +17,32 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: input.email,
       password: input.password,
     });
 
-    if (error) return alert("Error en los datos del usuario");
+    if (error) {
+      setErrorMessage("Error en los datos del usuario");
+      return;
+    }
 
     navigate("/dashboard");
+  };
+
+  const handleGoogleLogin = async () => {
+    setErrorMessage("");
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) setErrorMessage("No se pudo iniciar sesión con Google");
   };
 
   return (
@@ -41,6 +59,19 @@ export default function Login() {
         {location.state?.message && (
           <div className="login-alert">{location.state.message}</div>
         )}
+
+        {errorMessage && <div className="login-alert">{errorMessage}</div>}
+
+        <button type="button" className="btn btn-google" onClick={handleGoogleLogin}>
+          <span className="google-mark" aria-hidden="true">
+            G
+          </span>
+          Continuar con Google
+        </button>
+
+        <div className="login-divider" aria-hidden="true">
+          <span>o</span>
+        </div>
 
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="input-form">

@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "./layouts/Dashboard";
 import Product from "./layouts/Product";
 import Collection from "./layouts/Collection";
+import SharedCollection from "./layouts/SharedCollection";
 import { supabase } from "./utils/supabase";
 
 const ThemeContext = createContext(null);
@@ -173,6 +174,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/shared/:id" element={<SharedCollection />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

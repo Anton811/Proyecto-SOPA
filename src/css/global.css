@@ -7,6 +7,7 @@
   --brand: #087f6d;
   --brand-dark: #075b51;
   --surface: #ffffff;
+  --surface-muted: #f3f8f6;
   --line: #dce7e1;
   --danger: #b84b42;
 }
@@ -339,7 +340,53 @@ p {
 .collection-page {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 36px 28px 40px;
+  padding: 36px 28px 100px;
+}
+
+.collection-summary {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px max(28px, calc((100vw - 1180px) / 2 + 28px));
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  color: var(--muted);
+  box-shadow: 0 -8px 24px rgba(24, 48, 45, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.collection-summary strong {
+  color: var(--ink);
+}
+
+.collection-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 10px;
+}
+
+.collection-share-btn {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.collection-copy-message {
+  position: fixed;
+  right: 20px;
+  bottom: 76px;
+  z-index: 11;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 8px 20px rgba(24, 48, 45, 0.12);
 }
 
 .collection-header {
@@ -439,8 +486,26 @@ p {
     align-items: flex-start;
   }
 
+  .collection-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .collection-header-actions {
+    justify-content: start;
+  }
+
   .filters-row {
     grid-template-columns: 1fr;
+  }
+
+  .collection-page {
+    padding-bottom: 88px;
+  }
+
+  .collection-summary {
+    padding: 12px 16px;
+    font-size: 0.9rem;
   }
 }
 
@@ -449,6 +514,7 @@ p {
     --ink: #e3eeea;
     --muted: #a7bbb4;
     --surface: #1d2b29;
+    --surface-muted: #243632;
     --line: #38504a;
     --brand-dark: #86d1bd;
     color: var(--ink);
@@ -459,6 +525,7 @@ p {
   --ink: #e3eeea;
   --muted: #a7bbb4;
   --surface: #1d2b29;
+  --surface-muted: #243632;
   --line: #38504a;
   --brand-dark: #86d1bd;
   color: var(--ink);

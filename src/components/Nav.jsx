@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/nav.css";
 import { supabase } from "../utils/supabase";
@@ -7,6 +7,22 @@ import { useTheme } from "../App";
 export default function Nav() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    const loadDisplayName = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const metadata = user?.user_metadata;
+      const name = metadata?.display_name || metadata?.full_name || metadata?.name;
+
+      if (name) setDisplayName(name);
+    };
+
+    loadDisplayName();
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -17,7 +33,7 @@ export default function Nav() {
     <nav className="app-nav">
       <div className="nav-top-row">
         <div className="nav-brand">
-          <h1>Tu lista</h1>
+          <h1>{displayName ? `Bienvenido, ${displayName}` : "Tu lista"}</h1>
         </div>
 
         <label

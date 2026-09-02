@@ -10,6 +10,7 @@ export default function Collection() {
   const [collection, setCollection] = useState(null);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [copyMessage, setCopyMessage] = useState("");
 
   const status = ["Disponible", "Pendiente", "No disponible"];
   const category = ["Electronica", "Ropa", "Hogar", "Salud"];
@@ -97,6 +98,37 @@ export default function Collection() {
     }
   };
 
+  const totalPrice = products.reduce(
+    (total, product) => total + (Number(product.price) || 0),
+    0,
+  );
+  const formattedTotal = new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    maximumFractionDigits: 2,
+  }).format(totalPrice);
+  const acquiredProducts = products.filter((product) => product.checked === true);
+  const pendingProducts = products.filter((product) => product.checked !== true);
+  const formatPrice = (items) =>
+    new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+      maximumFractionDigits: 2,
+    }).format(items.reduce((total, product) => total + (Number(product.price) || 0), 0));
+
+  const copyCollectionLink = async () => {
+    const shareUrl = `${window.location.origin}/shared/${collection.id}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyMessage("Enlace copiado");
+    } catch {
+      setCopyMessage("No se pudo copiar el enlace");
+    }
+
+    window.setTimeout(() => setCopyMessage(""), 2500);
+  };
+
   return (
     <>
       <Nav />
@@ -123,9 +155,17 @@ export default function Collection() {
                 <h1>{collection.name}</h1>
                 <p>Productos guardados en esta colección.</p>
               </div>
-              <button className="btn btn-primary" onClick={() => navigate("/dashboard")}>
-                Volver a colecciones
-              </button>
+              <div className="collection-header-actions">
+                <button
+                  className="btn btn-secondary collection-share-btn"
+                  onClick={copyCollectionLink}
+                >
+                  Copiar colección
+                </button>
+                <button className="btn btn-primary" onClick={() => navigate("/dashboard")}>
+                  Volver a colecciones
+                </button>
+              </div>
             </div>
 
             {products.length === 0 ? (
@@ -201,6 +241,29 @@ export default function Collection() {
                 ))}
               </div>
             )}
+
+            {copyMessage && (
+              <div className="collection-copy-message" role="status">
+                {copyMessage}
+              </div>
+            )}
+            <footer className="collection-summary" aria-label="Resumen de la colección">
+              <span>
+                <strong>{products.length}</strong>{" "}
+                {products.length === 1 ? "producto" : "productos"}
+              </span>
+              <span>
+                Adquiridos: <strong>{acquiredProducts.length}</strong> (
+                {formatPrice(acquiredProducts)})
+              </span>
+              <span>
+                Pendientes: <strong>{pendingProducts.length}</strong> (
+                {formatPrice(pendingProducts)})
+              </span>
+              <span>
+                Total: <strong>{formattedTotal}</strong>
+              </span>
+            </footer>
           </>
         )}
       </main>

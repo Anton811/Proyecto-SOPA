@@ -43,6 +43,20 @@
   flex: 1;
 }
 
+.import-url-btn {
+  min-width: 116px;
+  padding-inline: 10px;
+  font-size: 0.82rem;
+}
+
+.url-message {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
 .input-action-btn {
   min-width: 42px;
   width: 42px;
